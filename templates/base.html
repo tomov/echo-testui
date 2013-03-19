@@ -17,6 +17,7 @@
 	<meta property="og:description" content=""/>
 
 	<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/jquery-ui-1.10.2.custom.min.css') }}" rel="stylesheet">
 	<style> body { padding-top: 60px; } </style>
 
 	<!-- SUPPORT FOR IE6-8 OF HTML5 ELEMENTS -->
@@ -26,6 +27,18 @@
 
 	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- for cool hover effects -->
+    <script src="{{ url_for('static', filename='js/jquery.qtip-1.0.0-rc3.min.js') }}"></script>
+    <!-- for autocomplete stuffs -->
+    <script src="{{ url_for('static', filename='js/jquery-ui-1.10.2.custom.min.js') }}"></script>
+    <!-- other cool stuffs -->
+    <script src="{{ url_for('static', filename='js/sprintf-0.6.js') }}"></script>   
+    <script src="{{ url_for('static', filename='js/jquery.timeago.js') }}"></script>
+
+    <!-- Echo stuffs. Order kinda matters -->
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/feed.js') }}"></script>
+
 	{% endblock %}
   </head>
 
@@ -60,7 +73,7 @@
 
 		{% block footer %}
 		<footer class="footer">
-			<p>&copy; testui</p>
+			<!-- <p>&copy; testui</p> -->
 		</footer>
 		{% endblock %}
 	</div>

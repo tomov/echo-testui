@@ -1,4 +1,78 @@
 {% extends "base.html" %}
 {% block content %}
-  <p>Welcome to testui!</p>
+
+  <div id="feed-template" hidden>
+  <p>
+  <table border=1>
+    <tr>
+      <td><img class="fb-prof-pic" src='' alt='PIC' /></td>
+      <td width='300px' class="quote-content">This is where the quote goes</td>
+      <td width=25px>
+        <img width='100%' class='quote-fav-active' src='{{ url_for('static', filename='img/heart_active@2x.png') }}' hidden>
+        <img width='100%' class='quote-fav-inactive' src='{{ url_for('static', filename='img/heart_inactive@2x.png') }}'>
+        <br />
+        <img width='100%' class='quote-echo-active' src='{{ url_for('static', filename='img/echo_active@2x.png') }}' hidden>
+        <img width='100%' class='quote-echo-inactive' src='{{ url_for('static', filename='img/echo_inactive@2x.png') }}'>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align='right'><div class="quoted-by">quoted by Momchil</div></td>
+    </tr>
+  </table>
+  </p>
+  </div>
+
+  
+  <hr />
+  <h1>Post Quote:</h1>
+
+  <p>
+  <div>
+    <p>Who'd you hear?<br /><input id="source" /> fbid: <input id="source-fbid" readonly/></p>
+    <p><textarea rows='4' cols='50' id='new-quote-content'>something funny</textarea></p>
+    <p>
+      Location: <input id="location" value="Princeton, NJ"/><br />
+      Latitude: <input id="location_lat" value="69.69"/><br />
+      Longitude: <input id="location_long" value="768.69"/>
+    </p>
+    <p><button type="button" id='add-quote'>Post</button></p>
+  </div>
+  </p>
+
+  <hr />
+
+  <div style='width: 500px; float: left'>
+    <h1>Feed</h1>
+    <p><button type="button" id='update-feed'>Update Feed</button></p>
+    <p>
+    <div id="feed"></div>
+    </p>
+  </div>
+
+  <div style='width: 400px; float: left'>
+    <h1>Quote</h1>
+    <div id='quote'>
+    <table border=1>
+      <tr>
+        <td width><img class="fb-prof-pic-source" src='' alt='PIC' /></td>
+        <td width='270px'><div class='source'>Jacob Simon</div><br/> <div class='created'>Yesterday</div></td>
+        <td width='70px'><div class='echoes'>0 echoes</div><br/><div class='likes'>0 likes</div></td>
+      </tr>
+      <tr>
+        <td colspan=3 class="quote-content">This is where the quote goes</td>
+      </tr>
+      <tr>
+        <td><img class="fb-prof-pic-reporter" src='' alt='PIC' /></td>
+        <td><div align='right' class="quoted-by">quoted by Momchil</div></td>
+        <td>
+          <img width='50%' style='float: left;' class='quote-fav-active' src='{{ url_for('static', filename='img/heart_active@2x.png') }}' hidden>
+          <img width='50%' style='float: left;' class='quote-fav-inactive' src='{{ url_for('static', filename='img/heart_inactive@2x.png') }}'>
+          <img width='50%' style='float: left;' class='quote-echo-active' src='{{ url_for('static', filename='img/echo_active@2x.png') }}' hidden>
+          <img width='50%' style='float: left;' class='quote-echo-inactive' src='{{ url_for('static', filename='img/echo_inactive@2x.png') }}'>
+        </td>
+      </tr>
+    </table>
+    </div>
+  </div>
+
 {% endblock %}
