@@ -431,7 +431,7 @@ function getQuoteSuccess(data, textStatus, jqXHR) {
         comment_dom.attr('id', dom_id);
 
         comment_dom.find('.comment-content').html(comment.comment);
-        comment_dom.find('.source').html(comment.name);
+        comment_dom.find('.comment-name').html(comment.name);
         comment_dom.find('.fb-prof-pic').attr('src', comment.picture_url);
         comment_dom.find('.created').html(jQuery.timeago(new Date(comment.timestamp * 1000)));
 
