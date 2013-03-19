@@ -1,15 +1,16 @@
 var WEBSERVER = 'http://0.0.0.0:5000/';
+
 var GET_QUOTES = WEBSERVER + 'get_quotes';
 var GET_QUOTE = WEBSERVER + 'get_quote'
 var DELETE_FAV = WEBSERVER + 'delete_fav'
 var ADD_FAV = WEBSERVER + 'add_fav';
 var DELETE_ECHO = WEBSERVER + 'delete_echo';
 var ADD_ECHO = WEBSERVER + 'add_echo';
-var ADD_QUOTE = WEBSERVER + 'add_quote'
+var ADD_QUOTE = WEBSERVER + 'add_quote';
+var ADD_COMMENT = WEBSERVER + 'add_comment';
 
 var FB_GRAPH = 'https://graph.facebook.com/';
 
-// default values, but you should pass them as GET arguments in the URL
 var FBID = '1454031404';
 // IMPORTANT: go to https://developers.facebook.com/tools/explorer/ to get a new one
 var FB_ACCESS_TOKEN = 'AAACEdEose0cBAPrRUlgoqu3PkUTK66zpYLsZChC5S0Yypg5gFtFDD6WaYp0lKugqRmAfucmF02HWFfy2CpdxbGLVnNHGWYxCFzTYNIt5oamKF8QPa';
@@ -69,7 +70,7 @@ function updateFeed() {
         'type' : 'GET',
         'dataType' : 'json',
         'data' : {
-            'fbid' : fbid 
+            'fbid' : window.fbid 
         },
         'success' : onFeedUpdateSuccess,
         'error' : onFeedUpdateFailure 
@@ -107,7 +108,7 @@ function onFeedUpdateSuccess(data, textStatus, jqXHR) {
         row['quoted_by'] = null;
         // record dom_id of quote row so we can update stuff
         // once we fetch the fb user details
-        dom_quoted_by_dict = { id: dom_id, class: 'quoted-by' };
+        dom_quoted_by_dict = { id: dom_id, class: 'quoted-by', prefix: 'quoted by '  };
         if (quote.reporterFbid in window.fbids_to_fetch) {
             window.fbids_to_fetch[quote.reporterFbid].push(dom_quoted_by_dict);
         } else {
@@ -136,7 +137,7 @@ function onFeedUpdateSuccess(data, textStatus, jqXHR) {
         echo_inactive_btn.click(addEchoClick);
 
         quote_dom.find('.quote-content').data('idx', i);
-        quote_dom.find('.quote-content').click(getQuote);
+        quote_dom.find('.quote-content').click(getQuoteClick);
 
         var hover_tip = JSON.stringify(quote).replace(/\,"/g, ',<br />"');
         quote_dom.find('.quote-content').qtip({
@@ -175,7 +176,7 @@ function deleteFavClick(event) {
     }
     console.log(idx + ' delete=> ' + quote_id);
     $.ajax({
-        'url' : DELETE_FAV + '/' + quote_id + '/' + fbid,
+        'url' : DELETE_FAV + '/' + quote_id + '/' + window.fbid,
         'type' : 'DELETE',
         'dataType' : 'json',
         'success' : null, 
@@ -201,7 +202,7 @@ function addFavClick(event) {
         'data' : {
             'data': JSON.stringify({
                 'quoteId' : quote_id,
-                'userFbid' : fbid 
+                'userFbid' : window.fbid 
             })
         },
         'success' : null, 
@@ -221,7 +222,7 @@ function deleteEchoClick(event) {
     }
     console.log(idx + ' delete=> ' + quote_id);
     $.ajax({
-        'url' : DELETE_ECHO + '/' + quote_id + '/' + fbid,
+        'url' : DELETE_ECHO + '/' + quote_id + '/' + window.fbid,
         'type' : 'DELETE',
         'dataType' : 'json',
         'success' : null, 
@@ -247,7 +248,7 @@ function addEchoClick(event) {
         'data' : {
             'data': JSON.stringify({
                 'quoteId' : quote_id,
-                'userFbid' : fbid 
+                'userFbid' : window.fbid 
             })
         },
         'success' : null, 
@@ -267,7 +268,7 @@ function addQuote() {
         'location_lat': location_lat,
         'location_long': location_long,
         'quote': quote,
-        'reporterFbid': fbid,
+        'reporterFbid': window.fbid,
         'sourceFbid': sourceFbid
     };
     console.log(data);
@@ -305,7 +306,7 @@ function clearNewQuote() {
     $('#source-fbid').val('');
 }
 
-function getQuote(event) {
+function getQuoteClick(event) {
     idx = $.data(this, 'idx');
     console.log(idx);
     quote_id = window.feed[idx]['quote']._id;
@@ -321,13 +322,17 @@ function getQuote(event) {
     window.selected_idx = idx;
     quote_dom.find('.quote-content').attr('style', "background-color:orange;");
     console.log(idx + ' get=> ' + quote_id);
+    getQuote(quote_id);
+}
+
+function getQuote(quote_id) {
     $.ajax({
         'url' : GET_QUOTE,
         'type' : 'GET',
         'dataType' : 'json',
         'data' : {
             'id' : quote_id,
-            'userFbid' : fbid 
+            'userFbid' : window.fbid 
         },
         'success' : getQuoteSuccess, 
         'error' : getQuoteFailure 
@@ -414,12 +419,67 @@ function getQuoteSuccess(data, textStatus, jqXHR) {
 
     fetchFacebookPeeps();
     quote_dom.show();
+
+    var container = $('#comments');
+    container.empty();
+    comments = quote.comments;
+    for (var i = 0; i < comments.length; i++) {
+        comment = comments[i];
+        comment_dom = $('#comment-template').clone();
+
+        dom_id = 'comment-' + i.toString();
+        comment_dom.attr('id', dom_id);
+
+        comment_dom.find('.comment-content').html(comment.comment);
+        comment_dom.find('.source').html(comment.name);
+        comment_dom.find('.fb-prof-pic').attr('src', comment.picture_url);
+        comment_dom.find('.created').html(jQuery.timeago(new Date(comment.timestamp * 1000)));
+
+        comment_dom.show();
+        comment_dom.appendTo(container);
+    }
+
 }
 
 function getQuoteFailure(jqXHR, textStatus, errorThrown) {
     genericError(jqXHR, textStatus, errorThrown);
 }
 
+function addComment() {
+    var quote_id = window.feed[selected_idx]['quote']._id;
+    var comment = $('#new-comment-content').val();
+    $('#add-comment').html('Posting...');
+    $.ajax({
+        'url' : ADD_COMMENT,
+        'type' : 'POST',
+        'dataType' : 'json',
+        'data' : {
+            'data': JSON.stringify({
+                'userFbid' : window.fbid,
+                'quoteId' : quote_id,
+                'comment' : comment
+            })
+        },
+        'success' : addCommentSuccess, 
+        'error' : addCommentFailure 
+    });
+}
+
+function addCommentSuccess(data, textStatus, jqXHR) {
+    clearNewComment();
+    var quote_id = window.feed[selected_idx]['quote']._id; // this will fuck up big time if the quote is unselected in the meantime
+    getQuote(quote_id);
+}
+
+function addCommentFailure(jqXHR, textStatus, errorThrown) {
+    clearNewComment();
+    genericError(jqXHR, textStatus, errorThrown);
+}
+
+function clearNewComment() {
+    $('#add-comment').html('Comment');
+    $('#new-comment-content').val('');
+}
 
 $.urlParam = function(name){
     var results = new RegExp('[\\?&amp;]' + name + '=([^&amp;#]*)').exec(window.location.href);
@@ -432,6 +492,7 @@ $(document).ready(function() {
     updateFeed();
 
     $('#add-quote').click(addQuote);
+    $('#add-comment').click(addComment);
 
     window.access_token = $.urlParam('access_token');
     if (!window.access_token) {
