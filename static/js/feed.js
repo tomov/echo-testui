@@ -1,5 +1,4 @@
-//var WEBSERVER = 'http://0.0.0.0:5000/';
-var WEBSERVER = 'http://api.echoapp.me/';
+var WEBSERVER = 'http://0.0.0.0:5000/';
 
 var GET_QUOTES = WEBSERVER + 'get_quotes';
 var GET_QUOTE = WEBSERVER + 'get_quote'

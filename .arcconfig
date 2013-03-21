@@ -1,4 +1,4 @@
 {
   "project_id" : "test-ui",
-  "conduit_uri" : "https://phabricator.echoapp.me/"
+  "conduit_uri" : "http://phabricator.echoapp.me/"
 }
