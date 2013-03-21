@@ -104,11 +104,15 @@ function onFeedUpdateSuccess(data, textStatus, jqXHR) {
         quote_dom.find('.fb-prof-pic').attr('src', pic_url);
         row['pic_url'] = pic_url;
 
-        quote_dom.find('.quoted-by').html('quoted by PENDING...');
+        quote_dom.find('.quoted-by').html('quoted/echoed by PENDING...');
         row['quoted_by'] = null;
         // record dom_id of quote row so we can update stuff
         // once we fetch the fb user details
-        dom_quoted_by_dict = { id: dom_id, class: 'quoted-by', prefix: 'quoted by '  };
+        var prfx = 'quoted by ';
+        if (quote.is_echo) {
+            prfx = 'echoed by ';
+        }
+        dom_quoted_by_dict = { id: dom_id, class: 'quoted-by', prefix: prfx  };
         if (quote.reporterFbid in window.fbids_to_fetch) {
             window.fbids_to_fetch[quote.reporterFbid].push(dom_quoted_by_dict);
         } else {
@@ -357,7 +361,11 @@ function getQuoteSuccess(data, textStatus, jqXHR) {
 
     // record dom_id of quote row so we can update stuff
     // once we fetch the fb user details
-    dom_quoted_by_dict = { id: 'quote', class: 'quoted-by', prefix: 'quoted by ' };
+    var prfx = 'quoted by ';
+        if (quote.is_echo) {
+            prfx = 'echoed by ';
+        }
+    dom_quoted_by_dict = { id: 'quote', class: 'quoted-by', prefix: prfx };
     if (quote.reporterFbid in window.fbids_to_fetch) {
         window.fbids_to_fetch[quote.reporterFbid].push(dom_quoted_by_dict);
     } else {
