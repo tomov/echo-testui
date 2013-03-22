@@ -2,6 +2,8 @@ var WEBSERVER = 'http://0.0.0.0:5000/';
 
 var GET_QUOTES = WEBSERVER + 'get_quotes';
 var GET_QUOTE = WEBSERVER + 'get_quote'
+var GET_ECHOERS = WEBSERVER + 'get_echoers'
+var GET_FAVS = WEBSERVER + 'get_favs'
 var DELETE_FAV = WEBSERVER + 'delete_fav'
 var ADD_FAV = WEBSERVER + 'add_fav';
 var DELETE_ECHO = WEBSERVER + 'delete_echo';
@@ -143,7 +145,7 @@ function onFeedUpdateSuccess(data, textStatus, jqXHR) {
         quote_dom.find('.quote-content').data('idx', i);
         quote_dom.find('.quote-content').click(getQuoteClick);
 
-        var hover_tip = JSON.stringify(quote).replace(/\,"/g, ',<br />"');
+        var hover_tip = format_json(quote); 
         quote_dom.find('.quote-content').qtip({
             content: hover_tip, 
             show: 'mouseover',
@@ -156,8 +158,8 @@ function onFeedUpdateSuccess(data, textStatus, jqXHR) {
             style: {
                 'font-size': 12,
                 'line-height': '110%',
-                width: 200,
-                height: 160,
+                width: 'auto',
+                height: 'auto',
             }
         });
 
@@ -310,6 +312,72 @@ function clearNewQuote() {
     $('#source-fbid').val('');
 }
 
+function getFavs(quote_id) {
+    $.ajax({
+        'url' : GET_FAVS, 
+        'type' : 'GET',
+        'dataType' : 'json',
+        'data' : {
+            'quoteId' : quote_id,
+        },
+        'success' : getFavsSuccess, 
+        'error' : genericError
+    });
+}
+
+function getFavsSuccess(data, textStatus, jqXHR) { 
+    var hover_tip = format_json(data); 
+    $('#quote').find('.likes').qtip({
+        content: hover_tip,
+        show: 'mouseover',
+        position: {
+            corner: {
+                target: 'center',
+                tooltip: 'leftMiddle'
+            },
+        },
+        style: {
+            'font-size': 12,
+            'line-height': '110%',
+            width: 'auto',
+            height: 'auto',
+        }
+    });
+}
+
+function getEchoers(quote_id) {
+    $.ajax({
+        'url' : GET_ECHOERS, 
+        'type' : 'GET',
+        'dataType' : 'json',
+        'data' : {
+            'quoteId' : quote_id,
+        },
+        'success' : getEchoersSuccess, 
+        'error' : genericError
+    });
+}
+
+function getEchoersSuccess(data, textStatus, jqXHR) { 
+    var hover_tip = format_json(data); 
+    $('#quote').find('.echoes').qtip({
+        content: hover_tip,
+        show: 'mouseover',
+        position: {
+            corner: {
+                target: 'center',
+                tooltip: 'leftMiddle'
+            },
+        },
+        style: {
+            'font-size': 12,
+            'line-height': '110%',
+            width: 'auto',
+            height: 'auto',
+        }
+    });
+}
+
 function getQuoteClick(event) {
     idx = $.data(this, 'idx');
     console.log(idx);
@@ -327,6 +395,8 @@ function getQuoteClick(event) {
     quote_dom.find('.quote-content').attr('style', "background-color:orange;");
     console.log(idx + ' get=> ' + quote_id);
     getQuote(quote_id);
+    getEchoers(quote_id);
+    getFavs(quote_id);
 }
 
 function getQuote(quote_id) {
@@ -407,9 +477,9 @@ function getQuoteSuccess(data, textStatus, jqXHR) {
     echo_active_btn.click(deleteEchoClick);
     echo_inactive_btn.click(addEchoClick);
 
-    var hover_tip = JSON.stringify(quote).replace(/\,"/g, ',<br />"');
+    var hover_tip = format_json(quote); 
     quote_dom.find('.quote-content').qtip({
-        content: hover_tip, 
+        content: hover_tip,
         show: 'mouseover',
         position: {
             corner: {
@@ -420,8 +490,8 @@ function getQuoteSuccess(data, textStatus, jqXHR) {
         style: {
             'font-size': 12,
             'line-height': '110%',
-            width: 200,
-            height: 300,
+            width: 'auto',
+            height: 'auto',
         }
     });
 
